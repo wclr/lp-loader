@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "outDir": "./lib",
+    "declaration": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "newLine": "LF",
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "lp": [
+        "src/lp-loader"
+      ],
+      "lp-loader/lib/fn": [
+        "lib/fn"
+      ],
+      "lp!./*": [
+        "./*"
+      ]
+    }
+  },
+  "formatCodeOptions": {
+    "indentSize": 2,
+    "tabSize": 2
+  },
+  "include": [
+    "src/*"
+  ],
+  "exclude": [
+    "**/node_modules"
+  ]  
+}

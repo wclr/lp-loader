@@ -1,0 +1,19 @@
+
+{
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  //"editor.fontFamily": "Copyright C) H&Co | typography. Semi Light"
+  //"editor.fontFamily": "Consolas, 'Courier New', monospace",
+  "files.exclude": {
+    ".idea": true
+  },    
+    "search.exclude": {
+    ".idea": true,
+    "dist": true,    
+    "public": true
+  },
+  "typescript.tsdk": "./node_modules/typescript/lib", // we want to use the TS server from our node_modules folder to control its version
+  "tslint.run": "onSave",
+  "editor.formatOnType": true,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true
+}

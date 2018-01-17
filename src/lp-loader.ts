@@ -5,6 +5,7 @@
 import * as webpack from 'webpack'
 import * as path from 'path'
 import * as fs from 'fs'
+import * as qs from 'querystring'
 
 export interface LoaderOptions {
   /**
@@ -64,7 +65,8 @@ interface LoaderContext {
   _module: Module
   data: LoaderSharedData
   cacheable: () => {}
-  options: LoaderOptions
+  query: LoaderOptions | string
+  resourcePath: string
 }
 
 const log = (label: string) => <T>(x: T): T => !console.log(label + ':', x) && x
@@ -98,7 +100,7 @@ const moduleIsChunk = isModuleDynamicDependency
 
 const onlyStaticParents = (r: Reason) => isDependencyStatic(r.dependency)
 
-const findChunkParents = (mod: Module, depsChain: Module[] = []): Module[] => {  
+const findChunkParents = (mod: Module, depsChain: Module[] = []): Module[] => {
   const staticParentModules = mod.reasons
     .filter(r => depsChain.indexOf(r.module) < 0)
     .filter(onlyStaticParents).map(r => r.module)
@@ -108,6 +110,17 @@ const findChunkParents = (mod: Module, depsChain: Module[] = []): Module[] => {
 
   return notChunks.map((m) => findChunkParents(m, depsChain.concat(mod)))
     .reduce<Module[]>(flatten, []).concat(chunks)
+}
+
+function getOptions(context: LoaderContext): LoaderOptions {
+  const query = context.query
+  if (typeof query === 'string' && query !== "") {
+    return qs.parse(context.query as string)
+  }
+  if (!query || typeof query !== 'object') {
+    return {}
+  }
+  return query
 }
 
 module.exports = function (this: LoaderContext, source: string) {
@@ -134,7 +147,6 @@ module.exports = function (this: LoaderContext, source: string) {
       newExport
     ].join('\n')
   }
-  // console.log('new Source', source)
   return source
 }
 
@@ -145,7 +157,7 @@ module.exports.pitch = function (
   data: LoaderContext['data']) {
   this.cacheable && this.cacheable()
 
-  const options = this.options
+  const options = getOptions(this)
   const promiseLib = options.promiseLib || ''
   const bundleName = options.name || 'lp'
   const requestParts = remainingRequest.split('!')

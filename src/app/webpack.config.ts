@@ -1,5 +1,4 @@
 import * as webpack from 'webpack'
-import { LpPlugin } from '../plugin'
 import * as path from 'path'
 import * as fs from 'fs'
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -42,7 +41,6 @@ export const makeConfig = (isProduction = false) => {
         root: path.resolve(__dirname, '../..')
       }),
       new (webpack as any).NamedModulesPlugin(),
-      // new LpPlugin({}),
       new webpack.HotModuleReplacementPlugin(),
       new HtmlWebpackPlugin({
         title: 'LP-Loader ' + (isDevelopment ? 'Dev' : 'Build'),

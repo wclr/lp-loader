@@ -104,7 +104,9 @@ const findChunkParents = (mod: Module, depsChain: Module[] = []): Module[] => {
   const staticParentModules = mod.reasons
     .filter(r => depsChain.indexOf(r.module) < 0)
     .filter(onlyStaticParents).map(r => r.module)
-
+  if (!staticParentModules.length) {
+    return [mod]
+  }
   const chunks = staticParentModules.filter(moduleIsChunk)
   const notChunks = staticParentModules.filter(m => !moduleIsChunk(m))
 
@@ -125,18 +127,11 @@ function getOptions(context: LoaderContext): LoaderOptions {
 
 module.exports = function (this: LoaderContext, source: string) {
   const parentChunks = findChunkParents(this._module)
-  // for debuging: module structure
-  // parentChunks.forEach((m) => {
-  //   console.log('xxx', m.context, m.reasons[0] && m.reasons[0].dependency.block!.chunkName)
-  //   fs.writeFileSync(`${m.debugId}.json`, require('circular-json').stringify(m, null, 2))
-  // })
   const parentChunksIds = parentChunks
     .map(m => m.name || getChunkNameOfDynamicDependency(m) || m.debugId)
     .filter(uniq)
     .sort()
   const chunkId = parentChunksIds.join('-')
-  //console.log('source', source)
-  //return this.data.lpResult.replace(/__CHUNK_ID__/g, chunkId + '.')
   const newExport = this.data.fullExportStr.replace(/__CHUNK_ID__/g, chunkId + '.')
   const replaceRegExp = new RegExp(this.data.exportStr + '.*?;')
   if (replaceRegExp.test(source)) {
@@ -214,7 +209,7 @@ module.exports.pitch = function (
     ].join('')),
     'return Promise.resolve();',
     '};'
-    ).join('')
+  ).join('')
   data.promiseStr = promiseStr
   data.exportStr = exportStr
   data.fullExportStr = fullExportStr

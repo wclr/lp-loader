@@ -11,7 +11,7 @@
   },
   "author": "whitecolor",
   "files": [
-    "lib"
+    "lib/lp-loader.*"
   ],  
   "main": "./lib/lp-loader",
   "loader": "./lib/lp-loader",

@@ -30,6 +30,13 @@ export interface LoaderOptions {
    * If you seet empty string then export will be `exports = ` for ES5 format
    */
   exportName?: string
+  /**
+   * 
+   * Match lable files names, RegExp or function
+   */
+  filesMatch?: RegExp | ((filePath: string) => boolean),
+  
+  excludeFolders?: boolean
 }
 
 // https://webpack.js.org/api/stats/#module-objects
@@ -171,9 +178,20 @@ module.exports.pitch = function (
     : path.dirname(request!)
 
   type Entry = { fileName: string, label: string }
-
+  const filterFiles = (fileName: string) => {
+    const filePath = path.join(dirname, fileName)
+    return !excludeFiles.test(fileName) && (
+      !options.filesMatch || (
+        typeof options.filesMatch === 'function'
+          ? options.filesMatch(filePath)  
+          : options.filesMatch.test(filePath)
+      )
+    ) && (
+      !options.excludeFolders || !fs.statSync(filePath).isDirectory()
+    )
+  }
   const entries: Entry[] = fs.readdirSync(dirname)
-    .filter(f => !excludeFiles.test(f))
+    .filter(filterFiles)
     .map(fileName => ({
       fileName, label: fileName.replace(/\..*/, '')
     }))

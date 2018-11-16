@@ -2,6 +2,8 @@
 
 > Frictionless language packs for apps loaded and bundled with Webpack. Though `L` may stand for anything, may call it `Label` for general case.
 
+*Works with Webpack 3 and 4.*
+
 ## What it does
 
 #### Simple example of bundling language packs.
@@ -16,19 +18,24 @@ Say you have tree components in your application that you going to bundle with w
 For every component you have a language dictionaries:
 
 ```
-app/A/dict/en.json
-app/A/dict/ru.json
+app/A/dict/
+  en.json
+  ru.json
 
-app/B/dict/en.json
-app/B/dict/ru.json
+app/B/dict/
+  en.json
+  ru.json
 
-app/C/dict/en.json
-app/C/dict/ru.json
+app/C/dict/
+  en.json
+  ru.json
 ```
 
-Say you tuned webpack to produce two bundles: `bundle-AB` that contains `A` and `B` components and separate `bundle-C` that contains `C` component.
+Say you tuned webpack to produce two bundles: 
+- `bundle-AB` - contains `A` and `B` components 
+- `bundle-C` - separate bundle that contains `C` component.
 
-Using `Lp-loader` you also get dynamicly loaded bundles tat contain corresponding dictionaries:
+Using `Lp-loader` you will get separate bundles for corresponding dictionaries:
 
 ```
 bundle-AB.ru.lp.js  - will contain `ru` dictionaries for A and B
@@ -38,25 +45,25 @@ bundle-C.ru.lp.js   - will contain `ru` dictionaries for C
 bundle-C.ru.lp.js   - will contain `en` dictionaries for C
 ```
 
-Particular language bundle **will be loaded dynamicly on demand** when it will be accessed from it's parent bundle code.
+Particular language bundle **will be loaded dynamically on demand** when it will be accessed from it's parent bundle code. If language is not used, bundle is not loaded.
 
-Note, `LP-loader` can be used to bundle this way not only language packs, but **any *labeled* sets of *data* or *code*** that should be loaded dynamicly on demand.
+Note, `LP-loader` can be used to bundle this way not only language packs, but **any *labeled* sets of *data* or *code*** that should be loaded dynamically on demand.
 
 ## Configuration
 
-First, determine which files will be used as lp index files. This files you will be importing to get access to the labeld files.
+This is the example with TypeScript based dictionaries, so you have to have following files:
 
 ```
-app/A/dict/en.ts      - dict for `english` language
-app/A/dict/ru.ts      - dict for `english` language
-app/A/dict/index.ts   - lp-index file
-app/A/index.ts        - component file
+app/A/
+  A.ts        - component file
+app/A/dict/
+  en.ts      - dict for `english` language
+  ru.ts      - dict for `english` language
+  index.ts   - lp-index file
+
 ```
 
-Your lp-index file (`app/A/dict/index.ts`) should return
-
-```
-```
+Your lp-index file (`app/A/dict/index.ts`) may be empty in case of JS, but it should exist, its loaded content will be generated while build. In case of TS should be filled with code for correct typings (see example app code).
 
 - in component file you import lp-index file
 
@@ -75,7 +82,7 @@ In webpack config you should define loader for this files:
     {
       test: /dict(\\|\/)index.ts/, loaders: [
         { loader: 'lp-loader', options: { name: 'language.pack' } },
-        // determine transform loaders for lp-indx files:
+        // determine transform loaders for lp-index files:
         { loader: 'ts-loader', options: tsLoaderOptions }
       ]
     },
@@ -99,9 +106,11 @@ export interface LoaderOptions {
    */
   name?: string,
   /**
-   * Custom promis library to be imported. 
+   * Custom promise library name to be imported. 
    */
   promiseLib?: string,
+
+  disableLoaders?: boolean, // TODO: remove this option?
   /**
    * Target ES format for exporting loading function.
    * Default is es6.
@@ -112,9 +121,24 @@ export interface LoaderOptions {
    * If you seet empty string then export will be `exports = ` for ES5 format
    */
   exportName?: string
+  /**
+   * 
+   * Match label files names (actually full path), RegExp or function, 
+   * By default index.* files are excluded, you may override it.
+   */
+  filesMatch?: RegExp | ((filePath: string) => boolean),
+  /**
+ * 
+ * Do not consider folders as labeled data. By default `false`
+ */
+  excludeFolders?: boolean
 }
 ```
 
 ## How it works
 
-While loading of lp-index file `lp-loader it determines to which bundle it belongs and transforms lp-index file so that it exports correct code.
+It's magic. See the code.
+
+## Licence
+
+WTF.

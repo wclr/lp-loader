@@ -31,10 +31,14 @@ export interface LoaderOptions {
   exportName?: string
   /**
    * 
-   * Match lable files names, RegExp or function
+   * Match label files names (actually full path), RegExp or function, 
+   * By default index.* files are excluded, you may override it.
    */
   filesMatch?: RegExp | ((filePath: string) => boolean),
-  
+  /**
+ * 
+ * Do not consider folders as labeled data. By default `false`
+ */
   excludeFolders?: boolean
 }
 
@@ -157,7 +161,7 @@ module.exports.pitch = function (
   precedingRequest: string,
   data: LoaderContext['data']) {
   this.cacheable && this.cacheable()
-  
+
   const options = getOptions(this)
   const promiseLib = options.promiseLib || ''
   const bundleName = options.name || 'lp'
@@ -175,19 +179,19 @@ module.exports.pitch = function (
   const dirname = stats.isDirectory()
     ? request!
     : path.dirname(request!)
-
+  
   type Entry = { fileName: string, label: string }
   const filterFiles = (fileName: string) => {
     const filePath = path.join(dirname, fileName)
-    return !excludeFiles.test(fileName) && (
-      !options.filesMatch || (
-        typeof options.filesMatch === 'function'
-          ? options.filesMatch(filePath)  
-          : options.filesMatch.test(filePath)
-      )
-    ) && (
-      !options.excludeFolders || !fs.statSync(filePath).isDirectory()
-    )
+    const filesMatch = options.filesMatch
+    return filesMatch
+      ? typeof filesMatch === 'function'
+        ? filesMatch(filePath)
+        : filesMatch.test(filePath)
+      : !excludeFiles.test(fileName)
+        && fs.statSync(filePath).isDirectory()
+        ? !options.excludeFolders
+        : true
   }
   const entries: Entry[] = fs.readdirSync(dirname)
     .filter(filterFiles)

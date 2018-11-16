@@ -54,7 +54,7 @@ export const makeConfig = (isProduction = false) => {
             {
               loader: path.join(__dirname, '../src/lp-loader'), query: {
                 name: 'language.pack',
-                filesMatch: /\w{2}\.ts/
+                filesMatch: /(\\|\/)\w{2}\.ts/
               } as LoaderOptions
             } as any,
             //{ loader: 'ts-loader', query: tsLoaderOptions } as any

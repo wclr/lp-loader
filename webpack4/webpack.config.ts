@@ -3,20 +3,20 @@ import * as path from 'path'
 import * as fs from 'fs'
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
-
+import { LoaderOptions } from '../src/lp-loader'
 export const makeConfig = (isProduction = false) => {
   const isDevelopment = !isProduction
 
   const appEntry = [
-    path.resolve(__dirname, 'app')
+    path.join(__dirname, '../app/app')
   ]
 
   isDevelopment && appEntry.push(
-    'webpack-dev-server/client?http://localhost:' + process.env.PORT,
-    'webpack/hot/only-dev-server'
+    //'webpack-dev-server/client?http://localhost:' + process.env.PORT,
+    //'webpack/hot/only-dev-server'
   )
 
-  const buildDir = path.resolve('./build')
+  const buildDir = path.join(__dirname, 'build')
   const tsLoaderOptions = {
     compilerOptions: {
       module: "esnext",
@@ -24,7 +24,7 @@ export const makeConfig = (isProduction = false) => {
       moduleResolution: 'node'
     }
   }
-  const lpTsIndexFiles = /dict(\\|\/)index.ts/
+  const lpTsIndexFiles = /dict(\\|\/)index\.ts/
   const config: webpack.Configuration = {
     entry: {
       app: appEntry
@@ -48,12 +48,17 @@ export const makeConfig = (isProduction = false) => {
       })
     ],
     module: {
-      loaders: [        
-        { test: /dict(\\|\/)index.js/, loader: 'lp-loader' },
+      rules: [
         {
           test: lpTsIndexFiles, loaders: [
-            { loader: 'lp-loader', query: { name: 'language.pack' } } as any,
-            { loader: 'ts-loader', query: tsLoaderOptions } as any
+            {
+              loader: path.join(__dirname, '../src/lp-loader'), query: {
+                name: 'language.pack',
+                filesMatch: /\w{2}\.ts/
+              } as LoaderOptions
+            } as any,
+            //{ loader: 'ts-loader', query: tsLoaderOptions } as any
+            { loader: path.join(__dirname, 'ts-simple-loader'), query: tsLoaderOptions } as any
           ]
         },
         {
@@ -64,15 +69,6 @@ export const makeConfig = (isProduction = false) => {
         },
         { test: /\.css$/, loader: 'style!css' },
       ]
-    },
-    devServer: {
-      disableHostCheck: true,
-      hot: true,
-      stats: { colors: true },
-      port: process.env.PORT,
-      historyApiFallback: {
-        index: 'index.html',
-      }
     },
     devtool: 'eval',
     resolve: {
@@ -88,9 +84,9 @@ export const makeConfig = (isProduction = false) => {
         //'ts': 'ts-loader'
       },
       modules: [
-        path.resolve(__dirname, '../../node_modules'),
+        path.resolve(__dirname, 'node_modules'),
         path.resolve(__dirname, '../node_modules'),
-        path.resolve(__dirname, '../'),
+        path.resolve(__dirname, '../src'),
       ]
     }
   }

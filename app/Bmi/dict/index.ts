@@ -1,5 +1,3 @@
-//import lp from 'lp-loader/node'
-
 export type Dict = {
   desc: string
 }

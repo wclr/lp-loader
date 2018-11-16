@@ -1,4 +1,5 @@
-import {makeTitle, Dict } from '.'
+import { Dict } from '.'
+import { makeTitle } from './_'
 
 let dict: Dict = {
   title: makeTitle('ЛП Демо приложение'),

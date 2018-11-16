@@ -118,5 +118,3 @@ export interface LoaderOptions {
 ## How it works
 
 While loading of lp-index file `lp-loader it determines to which bundle it belongs and transforms lp-index file so that it exports correct code.
-
-

@@ -2,7 +2,6 @@
  MIT License http://www.opensource.org/licenses/mit-license.php
  Author: Whitecolor
  */
-import * as webpack from 'webpack'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as qs from 'querystring'
@@ -76,8 +75,6 @@ interface LoaderContext {
   resourcePath: string
 }
 
-const log = (label: string) => <T>(x: T): T => !console.log(label + ':', x) && x
-
 const flatten = <T>(flat: T[], found: T[]): T[] => flat.concat(found)
 
 const uniq = <T>(val: T, index: number, arr: T[]): boolean =>
@@ -110,7 +107,9 @@ const onlyStaticParents = (r: Reason) => isDependencyStatic(r.dependency)
 const findChunkParents = (mod: Module, depsChain: Module[] = []): Module[] => {
   const staticParentModules = mod.reasons
     .filter(r => depsChain.indexOf(r.module) < 0)
-    .filter(onlyStaticParents).map(r => r.module)
+    .filter(onlyStaticParents)
+    .map(r => r.module)
+    .filter(_ => !!_)
   if (!staticParentModules.length) {
     return [mod]
   }
@@ -158,7 +157,7 @@ module.exports.pitch = function (
   precedingRequest: string,
   data: LoaderContext['data']) {
   this.cacheable && this.cacheable()
-
+  
   const options = getOptions(this)
   const promiseLib = options.promiseLib || ''
   const bundleName = options.name || 'lp'

@@ -15,14 +15,8 @@
     "noEmit": false,
     "baseUrl": ".",
     "paths": {
-      "lp": [
-        "src/lp-loader"
-      ],
-      "lp-loader/lib/fn": [
-        "lib/fn"
-      ],
-      "lp!./*": [
-        "./*"
+      "lp-loader": [
+        "src/lp-loader.ts"
       ]
     }
   },

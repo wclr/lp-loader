@@ -7,6 +7,8 @@ import { LoaderOptions } from '../src/lp-loader'
 export const makeConfig = (isProduction = false) => {
   const isDevelopment = !isProduction
 
+  process.env.LP_DEBUG = 'true'
+
   const appEntry = [
     path.join(__dirname, '../app/app')
   ]
@@ -26,6 +28,7 @@ export const makeConfig = (isProduction = false) => {
   }
   const lpTsIndexFiles = /dict(\\|\/)index\.ts/
   const config: webpack.Configuration = {
+    //mode: 'development',
     entry: {
       app: appEntry
     },
@@ -54,7 +57,7 @@ export const makeConfig = (isProduction = false) => {
             {
               loader: path.join(__dirname, '../src/lp-loader'), query: {
                 name: 'language.pack',
-                filesMatch: /(\\|\/)\w{2}\.ts/
+                include: /(\\|\/)\w{2}\.ts/
               } as LoaderOptions
             } as any,
             //{ loader: 'ts-loader', query: tsLoaderOptions } as any

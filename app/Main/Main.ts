@@ -8,8 +8,8 @@ const { fromPromise, combine, merge } = xs
 
 const BmiDeferred = ({ DOM, language$ }:
   { DOM: DOMSource, language$: Stream<string> }) => {
-  return fromPromise(import(/* webpackChunkName: "bmi" */ '../Bmi/Bmi'))
-    .map(_ => _.default).compose(delay(6000))
+  return fromPromise(import(/* webpackChunkName: "bmi" */ '../Bmi'))
+    .map(_ => _.Bmi).compose(delay(6000))
     .map((Bmi) => Bmi({ DOM, language$ }).DOM)
     .flatten()
 }

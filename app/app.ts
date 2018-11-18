@@ -1,6 +1,6 @@
 import { run } from '@cycle/xstream-run'
 import { makeDOMDriver } from '@cycle/dom'
-import Main from './Main/Main'
+import { Main } from './Main'
 
 let dispose: any
 setTimeout(() => {
@@ -11,7 +11,7 @@ setTimeout(() => {
 
 if ((<any>module).hot) {
   (<any>module).hot.accept();
-  (<any>module).hot.dispose(() => {    
+  (<any>module).hot.dispose(() => {
     dispose()
     document.body.innerHTML = ''
   })

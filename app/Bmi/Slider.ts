@@ -5,7 +5,7 @@ import dict from './dict'
 
 const { fromPromise, combine, merge } = xs
 
-export const Main = ({ DOM }: { DOM: DOMSource }) => {
+export const Slider = ({ DOM }: { DOM: DOMSource }) => {
 
   let language$ = xs.of('en')
   let dict$ = language$.map(dict)
@@ -20,5 +20,3 @@ export const Main = ({ DOM }: { DOM: DOMSource }) => {
     })
   }
 }
-
-export default Main

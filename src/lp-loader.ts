@@ -34,7 +34,7 @@ export interface LoaderOptions {
    * Match label files names (actually full path), RegExp or function, 
    * By default index.* files are excluded, you may override it.
    */
-  filesMatch?: RegExp | ((filePath: string) => boolean),
+  include?: RegExp | ((filePath: string) => boolean),
   /**
  * 
  * Do not consider folders as labeled data. By default `false`
@@ -109,18 +109,19 @@ const moduleIsChunk = isModuleDynamicDependency
 const onlyStaticParents = (r: Reason) => isDependencyStatic(r.dependency)
 
 const findChunkParents = (mod: Module, depsChain: Module[] = []): Module[] => {
-  const staticParentModules = mod.reasons
-    .filter(r => depsChain.indexOf(r.module) < 0)
+  const staticParents = mod.reasons
     .filter(onlyStaticParents)
     .map(r => r.module)
+    .filter(uniq)
     .filter(_ => !!_)
-  if (!staticParentModules.length) {
+  const staticParentsNotInChain = staticParents.filter(m => depsChain.indexOf(m) < 0)
+  if (!staticParents.length) {
     return [mod]
   }
-  const chunks = staticParentModules.filter(moduleIsChunk)
-  const notChunks = staticParentModules.filter(m => !moduleIsChunk(m))
-
-  return notChunks.map((m) => findChunkParents(m, depsChain.concat(mod)))
+  const chunks = staticParentsNotInChain.filter(moduleIsChunk)
+  const notChunks = staticParentsNotInChain.filter(m => !moduleIsChunk(m))
+  const newChain = depsChain.concat(mod).concat(notChunks)
+  return notChunks.map((m) => findChunkParents(m, newChain))
     .reduce<Module[]>(flatten, []).concat(chunks)
 }
 
@@ -137,6 +138,15 @@ function getOptions(context: LoaderContext): LoaderOptions {
 
 module.exports = function (this: LoaderContext, source: string) {
   const parentChunks = findChunkParents(this._module)
+  console.log('process.env.LP_DEBUG', process.env.LP_DEBUG)
+  if (process.env.LP_DEBUG) {
+    console.log('LP-LOADER:', this._module.context)
+    console.log('Static parents: ', this._module.context, parentChunks
+      .filter(uniq)
+      .map(p => ({ req: p.userRequest, name: p.name, id: p.id, debugId: p.debugId }))
+    )
+  }
+
   const parentChunksIds = parentChunks
     .map(m => m.name || getChunkNameOfDynamicDependency(m) || m.debugId)
     .filter(uniq)
@@ -179,19 +189,20 @@ module.exports.pitch = function (
   const dirname = stats.isDirectory()
     ? request!
     : path.dirname(request!)
-  
+
   type Entry = { fileName: string, label: string }
   const filterFiles = (fileName: string) => {
     const filePath = path.join(dirname, fileName)
-    const filesMatch = options.filesMatch
-    return filesMatch
-      ? typeof filesMatch === 'function'
-        ? filesMatch(filePath)
-        : filesMatch.test(filePath)
-      : !excludeFiles.test(fileName)
-        && fs.statSync(filePath).isDirectory()
-        ? !options.excludeFolders
-        : true
+    const includeMatch = options.include as any
+    return (
+      includeMatch
+        ? typeof includeMatch === 'function'
+          ? includeMatch(filePath)
+          : includeMatch.test(filePath)
+        : !excludeFiles.test(fileName)
+    ) && (options.excludeFolders
+      ? !fs.statSync(filePath).isDirectory()
+      : true)
   }
   const entries: Entry[] = fs.readdirSync(dirname)
     .filter(filterFiles)
@@ -230,7 +241,8 @@ module.exports.pitch = function (
     ].join('')),
     'return Promise.resolve();',
     '};'
-  ).join('')
+    ).join('')
+
   data.promiseStr = promiseStr
   data.exportStr = exportStr
   data.fullExportStr = fullExportStr

@@ -15,7 +15,7 @@ Say you have tree components in your application that you going to bundle with w
 - app/B
 - app/C
 ```
-For every component you have a language dictionaries:
+For every component you have specific language dictionaries:
 
 ```
 app/A/dict/
@@ -31,23 +31,29 @@ app/C/dict/
   ru.json
 ```
 
-Say you tuned webpack to produce two bundles: 
+Say due to your app config webpack produces two bundles: 
 - `bundle-AB` - contains `A` and `B` components 
 - `bundle-C` - separate bundle that contains `C` component.
 
 Using `Lp-loader` you will get separate bundles for corresponding dictionaries:
 
 ```
-bundle-AB.ru.lp.js  - will contain `ru` dictionaries for A and B
-bundle-AB.en.lp.js  - will contain `en` dictionaries for A and B
+bundle-AB.en.lp.js  - will contain `ru` dictionaries for A and B
+bundle-AB.ru.lp.js  - will contain `en` dictionaries for A and B
 
-bundle-C.ru.lp.js   - will contain `ru` dictionaries for C
+bundle-C.en.lp.js   - will contain `ru` dictionaries for C
 bundle-C.ru.lp.js   - will contain `en` dictionaries for C
 ```
 
 Particular language bundle **will be loaded dynamically on demand** when it will be accessed from it's parent bundle code. If language is not used, bundle is not loaded.
 
-Note, `LP-loader` can be used to bundle this way not only language packs, but **any *labeled* sets of *data* or *code*** that should be loaded dynamically on demand.
+`LP-loader` can be used to bundle this way not only language packs, but **any *labeled* sets of *data* or *code*** that should be loaded dynamically on demand.
+
+## Install
+
+```
+yarn add lp-loader [--dev]
+```
 
 ## Configuration
 
@@ -58,14 +64,22 @@ app/A/
   A.ts        - component file
 app/A/dict/
   en.ts      - dict for `english` language
-  ru.ts      - dict for `english` language
+  ru.ts      - dict for `russian` language
   index.ts   - lp-index file
 
 ```
 
-Your lp-index file (`app/A/dict/index.ts`) may be empty in case of JS, but it should exist, its loaded content will be generated while build. In case of TS should be filled with code for correct typings (see example app code).
+Your lp-index file (`app/A/dict/index.ts`) may be empty in case of `JS`, but it should exist anyway, its loaded content will be generated while build. In case of `TS` for correct typings code like this should be put inside:
 
-- in component file you import lp-index file
+```ts
+type Dict = { /* Here goes a dictionary structure */ }
+
+declare const getDict: (lang: string) => Promise<Dict>
+
+export default getDict
+```
+
+In component file you import lp-index file
 
 ```ts
 import getDict from './dict'
@@ -76,7 +90,7 @@ let lang = 'en'
 getDict(lang).then(dict => ...)
 ```
 
-In webpack config you should define loader for this files:
+In `webpack.config` you should define loader for this files:
 
 ```ts
     {
@@ -89,7 +103,7 @@ In webpack config you should define loader for this files:
     {
       test: /\.ts$/,
       loader: 'ts-loader',
-      // dont forget to exlude lp-index files from general loader rules:
+      // dont forget to exclude lp-index files from general loader rules:
       exclude: [/dict(\\|\/)index.ts/], 
       options: tsLoaderOptions
     },
@@ -109,8 +123,6 @@ export interface LoaderOptions {
    * Custom promise library name to be imported. 
    */
   promiseLib?: string,
-
-  disableLoaders?: boolean, // TODO: remove this option?
   /**
    * Target ES format for exporting loading function.
    * Default is es6.
@@ -123,10 +135,10 @@ export interface LoaderOptions {
   exportName?: string
   /**
    * 
-   * Match label files names (actually full path), RegExp or function, 
-   * By default index.* files are excluded, you may override it.
+   * Match labeled files (tests full path), RegExp or function, 
+   * By default index.* files are excluded, you may override it with this option.
    */
-  filesMatch?: RegExp | ((filePath: string) => boolean),
+  include?: RegExp | ((filePath: string) => boolean),
   /**
  * 
  * Do not consider folders as labeled data. By default `false`

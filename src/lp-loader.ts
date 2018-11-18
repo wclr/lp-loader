@@ -138,7 +138,6 @@ function getOptions(context: LoaderContext): LoaderOptions {
 
 module.exports = function (this: LoaderContext, source: string) {
   const parentChunks = findChunkParents(this._module)
-  console.log('process.env.LP_DEBUG', process.env.LP_DEBUG)
   if (process.env.LP_DEBUG) {
     console.log('LP-LOADER:', this._module.context)
     console.log('Static parents: ', this._module.context, parentChunks

@@ -6,6 +6,12 @@
 
 *Works with Webpack 3 and 4.*
 
+## Why
+
+Because all the methods of i18n of JS frontend apps (particularly loading/delivering language-specific, usually ui-related, data) I've found out there - just suck. And seems like **no one knows how to make it right.** Here is a try to approach the problem in a bit opinionated but at the same time flexible and general way.
+
+*Note that LP-Loader is still experimental and may probably fail to handle many particular cases. But the concept has been battle tested.*
+
 ## What it does
 
 #### Simple example of bundling language packs.
@@ -51,7 +57,10 @@ Particular language bundle **will be loaded dynamically on demand** when it will
 
 Actually, `LP-loader` can be used to bundle this way not only language packs, but **any *labeled* sets of *data* or *code*** that should be loaded dynamically on demand.
 
-## Install
+## Installation
+
+![npm (scoped)](https://img.shields.io/npm/v/lp-loader.svg?maxAge=86400)
+
 
 ```
 yarn add lp-loader [--dev]
@@ -153,7 +162,7 @@ export interface LoaderOptions {
 
 It is quite simple. Loader finds chunk parents of the dictionary index, and generates special code to allow loading requested dictionary data on demand (via `Promise` based API).
 
-[You may want to look at the example app code](app/)
+*You may want to look at the example app code.*
 
 ## Licence
 

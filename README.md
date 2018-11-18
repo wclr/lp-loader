@@ -1,16 +1,14 @@
 # LP-Loader for Webpack
 
-> Frictionless language packs for apps loaded and bundled with Webpack. Though `L` may stand for anything, may call it `Label` for general case.
-
-> A simple way to load on demand any set of data bundled with Webpack.
+> Frictionless language packs for apps loaded and bundled with Webpack. Though `L` may stand for anything, may call it `Label` for general case, so it is a simple way to load on demand any set of data.
 
 *Works with Webpack 3 and 4.*
 
 ## Why
 
-Because all the methods of i18n of JS frontend apps (particularly loading/delivering language-specific, usually ui-related, data) I've found out there - just suck. And seems like **no one knows how to make it right.** Here is a try to approach the problem in a bit opinionated but at the same time flexible and general way.
+Because all the methods of i18n of JS frontend apps (particularly loading/delivering language-specific, usually ui-related data) I've manage to find out there - just ~~suck~~ could not suit my really basic requirements. Feels like **no one knows how to make it right.** So, this package is a try to approach the problem in a bit opinionated but at the same time simple, flexible and general way.
 
-*Note that LP-Loader is still experimental and may probably fail to handle many particular cases. But the concept has been battle tested.*
+*Note that LP-Loader is still experimental and may probably fail to handle some particular cases (esp. which are not aligned with documented structure). But the concept has been battle tested and proven.*
 
 ## What it does
 
@@ -80,7 +78,9 @@ app/A/dict/
 
 ```
 
-Your lp-index file (`app/A/dict/index.ts`) may be empty in case of `JS`, but it should exist anyway, its loaded content will be generated while build. In case of `TS` for correct typings code like this should be put inside:
+You need to have an index file (`app/A/dict/index.ts`) for each of your dictionaries (which is a folder). This file may be empty in case of `JS`, but it should exist anyway. It's bundled content will be generated while build by `lp-loader`. 
+
+In case of `TS` to have correct and useful dictionary typings code like this should be put inside:
 
 ```ts
 type Dict = { /* Here goes a dictionary structure */ }
@@ -90,7 +90,7 @@ declare const getDict: (lang: string) => Promise<Dict>
 export default getDict
 ```
 
-In component file you import lp-index file
+Then you just import this file in your apps code, and use it like this:
 
 ```ts
 import getDict from './dict'
@@ -101,7 +101,7 @@ let lang = 'en'
 getDict(lang).then(dict => ...)
 ```
 
-In `webpack.config` you should define loader for this files:
+In `webpack.config` you should define loader for index files:
 
 ```ts
     {

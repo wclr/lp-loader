@@ -12,9 +12,7 @@ Because all the methods of i18n of JS frontend apps (particularly loading/delive
 
 ## What it does
 
-#### Simple example of bundling language packs.
-
-Say you have tree components in your application that you going to bundle with webpack.
+Here is nominal case of bundling language packs. Say you have tree components in your application that you going to bundle with webpack.
 
 ```
 - app/A
@@ -37,7 +35,7 @@ app/C/dict/
   ru.json
 ```
 
-Say due to your app config webpack produces two bundles: 
+Say you structured the app and configured Webpack to produces two bundles: 
 - `bundle-AB` - contains `A` and `B` components 
 - `bundle-C` - separate bundle that contains `C` component.
 
@@ -51,9 +49,9 @@ bundle-C.en.lp.js   - will contain `ru` dictionaries for C
 bundle-C.ru.lp.js   - will contain `en` dictionaries for C
 ```
 
-Particular language bundle **will be loaded dynamically on demand** when it will be accessed from it's parent bundle code. If language is not used, language data bundles are not loaded.
+Particular language bundle **will be loaded dynamically on demand** when it will be accessed from it's parent bundle code (see below). If language is not used, language data bundles are not loaded.
 
-As stated above, `LP-Loader` can be used to bundle this way not only language specific dictionaries, but **any *labeled* sets of *data* or *code*** that should be loaded dynamically on demand.
+As stated above, `LP-Loader` can be used to bundle this way not only language specific dictionaries, but **any *labeled* sets of *data* or *code*** that need to be loaded on demand.
 
 ## Installation
 
@@ -64,17 +62,17 @@ As stated above, `LP-Loader` can be used to bundle this way not only language sp
 yarn add lp-loader [--dev]
 ```
 
-## Configuration
+## Usage
 
-This is the example with TypeScript based dictionaries, so you have to have following files:
+This is the example with TypeScript based dictionaries (because using TypeScript for language dictionaries data is super cool). So you have to have following files:
 
 ```
 app/A/
   A.ts        - component file
 app/A/dict/
-  en.ts      - dict for `english` language
-  ru.ts      - dict for `russian` language
-  index.ts   - lp-index file
+  en.ts      - dictionary file for `English` language
+  ru.ts      - dictionary file `Russian` language
+  index.ts   - dictionary index file
 
 ```
 
@@ -83,11 +81,26 @@ You need to have an index file (`app/A/dict/index.ts`) for each of your dictiona
 In case of `TS` to have correct and useful dictionary typings code like this should be put inside:
 
 ```ts
-type Dict = { /* Here goes a dictionary structure */ }
+type Dict = { 
+  /* Here goes a dictionary structure */ 
+  title: string
+}
 
 declare const getDict: (lang: string) => Promise<Dict>
 
 export default getDict
+```
+
+Each language dictionary file will look like this:
+
+```ts
+import { Dict } from '.'
+
+const dict: Dict = { 
+  title: 'Make i18n Great Again.'
+}
+
+export default dict
 ```
 
 Then you just import this file in your apps code, and use it like this:
@@ -98,29 +111,29 @@ import getDict from './dict'
 let lang = 'en'
 
 // this is how you access dictionary data for particular language
-getDict(lang).then(dict => ...)
+getDict(lang).then(dict => console.log(dict.name))
 ```
 
-In `webpack.config` you should define loader for index files:
+[*You may want to look at the example app's code.*](./app)
+
+# Configuration
+
+To get this code working in `webpack.config` you should define loader for dictionary index files:
 
 ```ts
     {
-      test: /dict(\\|\/)index.ts/, loaders: [
+      test: /dict(\\|\/)index\.ts/, 
+      loaders: [
         { loader: 'lp-loader', options: { name: 'language.pack' } },
-        // determine transform loaders for lp-index files:
-        { loader: 'ts-loader', options: tsLoaderOptions }
       ]
     },
     {
       test: /\.ts$/,
-      loader: 'ts-loader',
-      // dont forget to exclude lp-index files from general loader rules:
-      exclude: [/dict(\\|\/)index.ts/], 
-      options: tsLoaderOptions
+      loader: 'ts-loader'
     },
 ```
 
-[*You may want to look at the example app's code.*](./app)
+[*There are example configs in corresponding webpackX folders*](./webpack4/webpack.config.ts). Actually no difference between Webpack 3 and 4.
 
 ## Loader options:
 
@@ -160,11 +173,9 @@ export interface LoaderOptions {
 }
 ```
 
-[*There are example configs in corresponding webpackX folders*](./webpack4/webpack.config.ts). Actually no difference between Webpack 3 and 4.
-
 ## How it works
 
-It is quite simple. Loader finds chunk parents of the dictionary index, and generates special code to allow loading requested dictionary data on demand (via `Promise` based API).
+It is quite simple. Loader finds chunk parents of the dictionary index, and generates special code that allow loading requested data on demand via `Promise` based API.
 
 [*You may want to look at the loader's code.*](./src/lp-loader.ts)
 

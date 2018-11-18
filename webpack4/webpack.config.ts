@@ -61,13 +61,13 @@ export const makeConfig = (isProduction = false) => {
               } as LoaderOptions
             } as any,
             //{ loader: 'ts-loader', query: tsLoaderOptions } as any
-            { loader: path.join(__dirname, 'ts-simple-loader'), query: tsLoaderOptions } as any
+            //{ loader: path.join(__dirname, 'ts-simple-loader'), query: tsLoaderOptions } as any
           ]
         },
         {
           test: /\.ts$/,
           loader: 'ts-loader',
-          exclude: [lpTsIndexFiles],
+          //iexclude: [lpTsIndexFiles],
           query: tsLoaderOptions
         },
         { test: /\.css$/, loader: 'style!css' },

@@ -2,6 +2,8 @@
 
 > Frictionless language packs for apps loaded and bundled with Webpack. Though `L` may stand for anything, may call it `Label` for general case.
 
+> A simple way to load on demand any set of data bundled with Webpack.
+
 *Works with Webpack 3 and 4.*
 
 ## What it does
@@ -45,9 +47,9 @@ bundle-C.en.lp.js   - will contain `ru` dictionaries for C
 bundle-C.ru.lp.js   - will contain `en` dictionaries for C
 ```
 
-Particular language bundle **will be loaded dynamically on demand** when it will be accessed from it's parent bundle code. If language is not used, bundle is not loaded.
+Particular language bundle **will be loaded dynamically on demand** when it will be accessed from it's parent bundle code. If language is not used, language data bundles are not loaded.
 
-`LP-loader` can be used to bundle this way not only language packs, but **any *labeled* sets of *data* or *code*** that should be loaded dynamically on demand.
+Actually, `LP-loader` can be used to bundle this way not only language packs, but **any *labeled* sets of *data* or *code*** that should be loaded dynamically on demand.
 
 ## Install
 
@@ -149,7 +151,9 @@ export interface LoaderOptions {
 
 ## How it works
 
-It's magic. See the code.
+It is quite simple. Loader finds chunk parents of the dictionary index, and generates special code to allow loading requested dictionary data on demand (via `Promise` based API).
+
+[You may want to look at the example app code](app/)
 
 ## Licence
 

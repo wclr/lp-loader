@@ -1,7 +1,8 @@
 {
   "name": "lp-loader",
   "version": "1.0.0-pre.1",
-  "description": "",
+  "description": "Frictionless language packs for Webpack.",
+  "keywords": ["i18n", "l10n", "webpack", "loader", "dictionary", "languages"],
   "scripts": {    
     "wp3-build": "ts-node-dev webpack3/build",    
     "wp3-watch": "h --n lp-loader-wp3 -- ts-node-dev webpack3/watch",

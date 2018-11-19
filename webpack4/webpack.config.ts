@@ -13,11 +13,6 @@ export const makeConfig = (isProduction = false) => {
     path.join(__dirname, '../app/app')
   ]
 
-  isDevelopment && appEntry.push(
-    //'webpack-dev-server/client?http://localhost:' + process.env.PORT,
-    //'webpack/hot/only-dev-server'
-  )
-
   const buildDir = path.join(__dirname, 'build')
   const tsLoaderOptions = {
     compilerOptions: {
@@ -27,6 +22,7 @@ export const makeConfig = (isProduction = false) => {
     }
   }
   const lpTsIndexFiles = /dict(\\|\/)index\.ts/
+  const lpLoader = path.join(__dirname, '../src/lp-loader')
   const config: webpack.Configuration = {
     //mode: 'development',
     entry: {
@@ -35,16 +31,18 @@ export const makeConfig = (isProduction = false) => {
     output: {
       path: buildDir,
       filename: '[name]-[hash].js',
-      //-[chunkhash]
       chunkFilename: '[name]-[chunkhash].js',
       publicPath: '/'
     },
     plugins: [
-      new CleanWebpackPlugin([buildDir], {
-        root: path.resolve(__dirname, '../..')
-      }),
-      new (webpack as any).NamedModulesPlugin(),
-      new webpack.HotModuleReplacementPlugin(),
+      //new (webpack as any).NamedModulesPlugin(),
+      ...isDevelopment ? [
+        new webpack.HotModuleReplacementPlugin()
+      ] : [
+          new CleanWebpackPlugin([buildDir], {
+            root: path.resolve(__dirname, '../..')
+          })
+        ],
       new HtmlWebpackPlugin({
         title: 'LP-Loader ' + (isDevelopment ? 'Dev' : 'Build'),
         filename: 'index.html'
@@ -55,11 +53,11 @@ export const makeConfig = (isProduction = false) => {
         {
           test: lpTsIndexFiles, loaders: [
             {
-              loader: path.join(__dirname, '../src/lp-loader'), query: {
+              loader: lpLoader, query: {
                 name: 'language.pack',
                 include: /(\\|\/)\w{2}\.ts/
               } as LoaderOptions
-            } as any,
+            },
             //{ loader: 'ts-loader', query: tsLoaderOptions } as any
             //{ loader: path.join(__dirname, 'ts-simple-loader'), query: tsLoaderOptions } as any
           ]
@@ -73,14 +71,14 @@ export const makeConfig = (isProduction = false) => {
         { test: /\.css$/, loader: 'style!css' },
       ]
     },
-    devtool: 'eval',
+    devtool: isDevelopment ? 'eval' : 'inline-source-map',
     resolve: {
       extensions: ['.ts', '.js'],
       alias: {
         //'lp': path.resolve(__dirname, '../../lib/lp-loader.ts'),
       }
     },
-    resolveLoader: <any>{
+    resolveLoader: {
       extensions: ['.ts', '.js'],
       alias: {
         //'ts': 'awesome-typescript-loader'

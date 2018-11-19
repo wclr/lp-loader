@@ -36,10 +36,15 @@ export interface LoaderOptions {
    */
   include?: RegExp | ((filePath: string) => boolean),
   /**
- * 
- * Do not consider folders as labeled data. By default `false`
- */
-  excludeFolders?: boolean
+   * 
+   * Do not consider folders as labeled dictionary data. By default `false`
+   */
+  excludeFolders?: boolean,
+  /**
+   * 
+   * Output some debug data
+   */
+  debug?: boolean
 }
 
 // https://webpack.js.org/api/stats/#module-objects
@@ -137,8 +142,9 @@ function getOptions(context: LoaderContext): LoaderOptions {
 }
 
 module.exports = function (this: LoaderContext, source: string) {
+  const options = getOptions(this)
   const parentChunks = findChunkParents(this._module)
-  if (process.env.LP_DEBUG) {
+  if (process.env.LP_DEBUG || options.debug) {
     console.log('LP-LOADER:', this._module.context)
     console.log('Static parents: ', this._module.context, parentChunks
       .filter(uniq)

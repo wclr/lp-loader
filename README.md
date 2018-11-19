@@ -1,12 +1,14 @@
 # LP-Loader for Webpack
 
-> Frictionless *Language Packs* for apps loaded and bundled with Webpack. Keeping and loading any kind of dictionary data dynamically on demand in pure, conscious and flexible way.
+> Frictionless *Language Packs* for apps loaded and bundled with Webpack. Pure, conscious and flexible way of keeping and loading any kind of dictionary data dynamically on demand.
 
 *Works with Webpack 3 and 4.*
 
 ## Why
 
-Because all the methods of i18n of JS frontend apps (particularly loading/delivering language-specific, usually ui-related data) I've manage to find out there - just ~~suck~~ could not suit my really basic requirements. Feels like **no one knows how to make it right.** So, this package is a try to approach the problem in a bit opinionated but at the same time simple, flexible and general way. This approach also turned to be useful for loading any kind of dictionary-like data sets.
+Webpack is really a great Packager Manager and Bundler, despite all its caveats (mostly related to configuration and performance) it really gives has much more capabilities and puts less limitations on the user than any other bunder I've tried. But some (quite basic) higher level problems seem do be not solved even there.
+
+All the methods of i18n of JS frontend apps (particularly loading/delivering language-specific usually UI-related data) I've seen out there - just ~~suck~~ could not satisfy my really basic requirements (which are mostly - simplicity and flexibility). Sounds strange, but feels like **no one knows how to make it right.** So, this package trying to approach the problem in a bit opinionated but at the same time flexible and generalized way. And this approach turned to be also useful for loading any kind of dictionary-like data sets.
 
 *Note that LP-Loader is still experimental and may probably fail to handle some particular cases (esp. if not aligned with proposed principles). But the concept has been proven and battle tested.*
 
@@ -116,26 +118,24 @@ getDict(lang).then(dict => console.log(dict.name))
 
 [*You may want to look at the example app's code.*](./app)
 
-# Configuration
+## Configuration
 
-To get this code working in `webpack.config` you should define loader for dictionary index files:
+To get this code working, in `webpack.config` you should define loader for dictionary index files, just like that:
 
 ```ts
     {
       test: /dict(\\|\/)index\.ts/, 
       loaders: [
-        { loader: 'lp-loader', options: { name: 'language.pack' } },
+        { loader: 'lp-loader' },
       ]
-    },
-    {
-      test: /\.ts$/,
-      loader: 'ts-loader'
-    },
+    }    
 ```
 
 [*There are example configs in corresponding webpackX folders*](./webpack4/webpack.config.ts). Actually no difference between Webpack 3 and 4.
 
 ## Loader options:
+
+You may want to provide additional options for the loader to override the defaults.
 
 ```ts
 export interface LoaderOptions {
@@ -167,11 +167,15 @@ export interface LoaderOptions {
   include?: RegExp | ((filePath: string) => boolean),
   /**
  * 
- * Do not consider folders as labeled data. By default `false`
+ * Do not consider folders as labeled dictionary data. By default `false`
  */
   excludeFolders?: boolean
 }
 ```
+
+## Caveats
+
+There are currently some problems with created bundle's names due to the problem that chunk names are not always available during the Webpack build. But this probably is going to be solved somehow.
 
 ## How it works
 

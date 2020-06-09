@@ -6,7 +6,7 @@
 
 ## Why
 
-Webpack is really a great Packager Manager and Bundler, despite all its caveats (mostly related to configuration and performance) it really gives has much more capabilities and puts less limitations on the user than any other bunder I've tried. But some (quite basic) higher level problems seem do be not solved even there.
+Webpack is really a great Packager Manager and Bundler, despite all its caveats (mostly related to configuration and performance) it gives has much more capabilities and puts less limitations on the user than any other bunder I've tried. But some (quite basic) higher level problems seem do be not solved even there.
 
 All the methods of i18n of JS frontend apps (particularly loading/delivering language-specific usually UI-related data) I've seen out there - just ~~suck~~ could not satisfy my really basic requirements (which are mostly - simplicity and flexibility). Sounds strange, but feels like **no one knows how to make it right.** So, this package trying to approach the problem in a bit opinionated but at the same time flexible and generalized way. And this approach turned to be also useful for loading any kind of dictionary-like data sets.
 
@@ -175,7 +175,7 @@ export interface LoaderOptions {
 
 ## Caveats
 
-There are currently some problems with created bundle's names due to the problem that chunk names are not always available during the Webpack build. But this probably is going to be solved somehow.
+There are currently some problems with created bundle's names due to the fact that chunk/modules names are not always available when the loader performs. But this probably is going to be solved somehow.
 
 ## How it works
 

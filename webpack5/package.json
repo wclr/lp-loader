@@ -1,0 +1,10 @@
+{
+  "name": "webpack5",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "webpack": "^5.0.0-beta.17",
+    "webpack-dev-server": "^3.11.0"
+  }
+}

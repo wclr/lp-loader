@@ -10,6 +10,9 @@
     "wp4-build": "ts-node-dev webpack4/build",    
     "wp4-watch": "h --n lp-loader-wp4 -- ts-node-dev webpack4/watch",
     "wp4-wds": "h --n lp-loader-wp4-wds -- ts-node-dev webpack4/wds",
+    "wp5-build": "ts-node-dev webpack5/build",    
+    "wp5-watch": "h --n lp-loader-wp5 -- ts-node-dev webpack4/watch",
+    "wp5-wds": "h --n lp-loader-wp5-wds -- ts-node-dev webpack4/wds",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublishOnly": "tsc"
   },

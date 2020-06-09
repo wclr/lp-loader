@@ -1,6 +1,6 @@
 import * as webpack from 'webpack'
 import * as path from 'path'
-
+import * as fs from 'fs'
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 import { LoaderOptions } from '../src/lp-loader'
@@ -8,7 +8,7 @@ export const makeConfig = (isProduction = false) => {
   const isDevelopment = !isProduction
 
   process.env.LP_DEBUG = 'true'
-
+  
   const appEntry = [
     path.join(__dirname, '../app/app')
   ]
@@ -24,7 +24,7 @@ export const makeConfig = (isProduction = false) => {
   const lpTsIndexFiles = /dict(\\|\/)index\.ts/
   const lpLoader = path.join(__dirname, '../src/lp-loader')
   const config: webpack.Configuration = {
-    //mode: 'development',
+    //mode: 'development',    
     entry: {
       app: appEntry
     },
@@ -52,6 +52,7 @@ export const makeConfig = (isProduction = false) => {
       rules: [
         {
           test: lpTsIndexFiles, loaders: [
+            {}
             {
               loader: lpLoader, query: {
                 name: 'language.pack',

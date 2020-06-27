@@ -12,22 +12,17 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "newLine": "LF",
+    "skipLibCheck": true,
     "noEmit": false,
     "baseUrl": ".",
     "paths": {
-      "lp-loader": [
-        "src/lp-loader.ts"
-      ]
+      "lp-loader": ["src/lp-loader.ts"]
     }
   },
   "formatCodeOptions": {
     "indentSize": 2,
     "tabSize": 2
   },
-  "include": [
-    "src/*"
-  ],
-  "exclude": [
-    "**/node_modules"
-  ]  
+  "include": ["src/*"],
+  "exclude": ["**/node_modules"]
 }

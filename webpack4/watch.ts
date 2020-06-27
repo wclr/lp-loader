@@ -11,7 +11,7 @@ compiler.watch({ poll: 100 }, (err, stats) => {
 })
 
 const file = new staticServer(join(__dirname + '/build'))
-console.log('Static HTTP server is listenting on', process.env.PORT)
+console.log('Static HTTP server is listening on', process.env.PORT)
 http.createServer((request, response) => {
   request.addListener('end', function () {
     file.serve(request, response);

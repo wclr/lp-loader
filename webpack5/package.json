@@ -4,7 +4,13 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "webpack": "^5.0.0-beta.17",
+    "@types/webpack-dev-server": "^3.11.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^4.2.2",
+    "html-webpack-plugin": "^4.4.1",
+    "style-loader": "^1.2.1",
+    "ts-loader": "^8.0.3",
+    "webpack": "^5.0.0-beta.29",
     "webpack-dev-server": "^3.11.0"
   }
 }

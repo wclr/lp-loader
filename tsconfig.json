@@ -6,14 +6,14 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
+    "esModuleInterop": true,
     "noFallthroughCasesInSwitch": true,
-    "outDir": "./lib",
     "declaration": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "newLine": "LF",
     "skipLibCheck": true,
-    "noEmit": false,
+    "noEmit": true,
     "baseUrl": ".",
     "paths": {
       "lp-loader": ["src/lp-loader.ts"]
@@ -22,7 +22,5 @@
   "formatCodeOptions": {
     "indentSize": 2,
     "tabSize": 2
-  },
-  "include": ["src/*"],
-  "exclude": ["**/node_modules"]
+  }
 }

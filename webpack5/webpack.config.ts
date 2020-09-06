@@ -1,83 +1,86 @@
 import * as webpack from 'webpack'
 import * as path from 'path'
-import * as fs from 'fs'
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { LoaderOptions } from '../src/lp-loader'
 export const makeConfig = (isProduction = false) => {
   const isDevelopment = !isProduction
 
   process.env.LP_DEBUG = 'true'
-  
-  const appEntry = [
-    path.join(__dirname, '../app/app')
-  ]
+
+  const appEntry: webpack.Entry = [path.join(__dirname, '../app/app')]
 
   const buildDir = path.join(__dirname, 'build')
   const tsLoaderOptions = {
     compilerOptions: {
-      module: "esnext",
+      module: 'esnext',
       declaration: false,
-      moduleResolution: 'node'
-    }
+      moduleResolution: 'node',
+      noEmit: false
+    },
+    configFile: path.join(__dirname, 'tsconfig.json'),
   }
   const lpTsIndexFiles = /dict(\\|\/)index\.ts/
   const lpLoader = path.join(__dirname, '../src/lp-loader')
   const config: webpack.Configuration = {
-    //mode: 'development',    
+    mode: isProduction ? 'production' : 'development',
     entry: {
-      app: appEntry
+      app: appEntry,
     },
-    output: {
+    
+    output: {    
       path: buildDir,
-      filename: '[name]-[hash].js',
+      filename: '[name]-[fullhash].js',
       chunkFilename: '[name]-[chunkhash].js',
-      publicPath: '/'
+      publicPath: '/',
     },
     plugins: [
       //new (webpack as any).NamedModulesPlugin(),
-      ...isDevelopment ? [
-        new webpack.HotModuleReplacementPlugin()
-      ] : [
-          new CleanWebpackPlugin([buildDir], {
-            root: path.resolve(__dirname, '../..')
-          })
-        ],
+      ...(isDevelopment
+        ? [new webpack.HotModuleReplacementPlugin()]
+        : [new CleanWebpackPlugin({})]),
       new HtmlWebpackPlugin({
         title: 'LP-Loader ' + (isDevelopment ? 'Dev' : 'Build'),
-        filename: 'index.html'
-      })
+        filename: 'index.html',
+      }),
     ],
     module: {
       rules: [
         {
-          test: lpTsIndexFiles, loaders: [
-            {}
+          test: lpTsIndexFiles,
+          use: [
             {
-              loader: lpLoader, query: {
+              loader: lpLoader,
+              options: {
                 name: 'language.pack',
-                include: /(\\|\/)\w{2}\.ts/
-              } as LoaderOptions
+                include: /(\\|\/)\w{2}\.ts/,
+              } as LoaderOptions,
             },
-            //{ loader: 'ts-loader', query: tsLoaderOptions } as any
-            //{ loader: path.join(__dirname, 'ts-simple-loader'), query: tsLoaderOptions } as any
-          ]
+          ],
         },
         {
           test: /\.ts$/,
           loader: 'ts-loader',
           //iexclude: [lpTsIndexFiles],
-          query: tsLoaderOptions
+          options: tsLoaderOptions,
         },
-        { test: /\.css$/, loader: 'style!css' },
-      ]
+        {
+          test: /\.css$/,
+          use: [
+            {
+              loader: 'style',
+            },
+            { loader: 'css' },
+          ],
+        },
+      ],
     },
     devtool: isDevelopment ? 'eval' : 'inline-source-map',
     resolve: {
       extensions: ['.ts', '.js'],
       alias: {
         //'lp': path.resolve(__dirname, '../../lib/lp-loader.ts'),
-      }
+      },
     },
     resolveLoader: {
       extensions: ['.ts', '.js'],
@@ -89,8 +92,8 @@ export const makeConfig = (isProduction = false) => {
         path.resolve(__dirname, 'node_modules'),
         path.resolve(__dirname, '../node_modules'),
         path.resolve(__dirname, '../src'),
-      ]
-    }
+      ],
+    },
   }
 
   return config

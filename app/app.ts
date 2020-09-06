@@ -5,13 +5,13 @@ import { Main } from './Main'
 let dispose: any
 setTimeout(() => {
   dispose = run(Main, {
-    DOM: makeDOMDriver('body')
+    DOM: makeDOMDriver('body'),
   })
 })
 
 if ((<any>module).hot) {
-  (<any>module).hot.accept();
-  (<any>module).hot.dispose(() => {
+  ;(<any>module).hot.accept()
+  ;(<any>module).hot.dispose(() => {
     dispose()
     document.body.innerHTML = ''
   })

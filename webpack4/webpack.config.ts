@@ -4,7 +4,7 @@ import * as path from 'path'
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 import { LoaderOptions } from '../src/lp-loader'
-export const makeConfig = (isProduction = false) => {
+export const makeConfig = (isProduction = false) => {  
   const isDevelopment = !isProduction
 
   process.env.LP_DEBUG = 'true'

@@ -55,7 +55,7 @@ type Module = {
   debugId: number
   context: string
   userRequest: string
-  reasons: Reason[]
+  reasons: Reason[] // only in webpack4
 }
 
 interface Dependency {

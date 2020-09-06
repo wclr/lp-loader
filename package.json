@@ -4,8 +4,7 @@
   "description": "Frictionless language packs for Webpack.",
   "prettier": {
     "semi": false,
-    "singleQuote": true,
-    "arrowParens": "avoid"
+    "singleQuote": true
   },
   "keywords": [
     "i18n",
@@ -22,11 +21,12 @@
     "wp4-build": "ts-node-dev --respawn webpack4/build",
     "wp4-watch": "h --n lp-loader-wp4 -- ts-node-dev webpack4/watch",
     "wp4-wds": "ts-node-dev webpack4/wds",
-    "wp5-build": "ts-node-dev webpack5/build",
-    "wp5-watch": "h --n lp-loader-wp5 -- ts-node-dev webpack4/watch",
-    "wp5-wds": "h --n lp-loader-wp5-wds -- ts-node-dev webpack4/wds",
+    "wp5-build": "ts-node-dev --respawn webpack5/build",
+    "wp5-watch": "ts-node-dev webpack5/watch",
+    "wp5-wds": "ts-node-dev webpack5/wds",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublishOnly": "tsc"
+    "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "yarn build"
   },
   "author": "whitecolor",
   "files": [

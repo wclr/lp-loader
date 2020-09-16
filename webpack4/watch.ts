@@ -1,6 +1,6 @@
-import * as webpack from 'webpack'
+import webpack from 'webpack'
 import { makeConfig } from './webpack.config'
-import * as http from 'http'
+import http from 'http'
 import { join } from 'path'
 const staticServer = require('node-static').Server
 

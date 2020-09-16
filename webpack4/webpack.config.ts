@@ -18,13 +18,15 @@ export const makeConfig = (isProduction = false) => {
     compilerOptions: {
       module: "esnext",
       declaration: false,
-      moduleResolution: 'node'
-    }
+      moduleResolution: 'node',
+      noEmit: false
+    },
+    configFile: path.join(__dirname, 'tsconfig.json'),
   }
   const lpTsIndexFiles = /dict(\\|\/)index\.ts/
   const lpLoader = path.join(__dirname, '../src/lp-loader')
   const config: webpack.Configuration = {
-    //mode: 'development',
+    mode: isDevelopment ? 'development' : 'production',
     entry: {
       app: appEntry
     },

@@ -21,7 +21,8 @@ export const makeConfig = (isProduction = false) => {
     compilerOptions: {
       module: "esnext",
       declaration: false,
-      moduleResolution: 'node'
+      moduleResolution: 'node',
+      noEmit: false
     }
   }
   const lpTsIndexFiles = /dict(\\|\/)index.ts/

@@ -77,6 +77,7 @@ interface LoaderSharedData {
   exportStr: string
   fullExportStr: string
   promiseStr: string
+  keysFnStr: string
 }
 
 interface LoaderContext {
@@ -102,7 +103,7 @@ const isDependencyDynamic = (dependency: Dependency): boolean =>
 
 const getChunkNameOfDynamicDependency = (mod: Module) =>
   (
-    mod.reasons.map(r => r.dependency).filter(isDependencyDynamic)[0] || {
+    mod.reasons.map((r) => r.dependency).filter(isDependencyDynamic)[0] || {
       block: { chunkName: '' },
     }
   ).block!.chunkName
@@ -111,7 +112,7 @@ const isModuleDynamicDependency = (mod: Module): boolean => {
   // Maybe here we should check non-zero count of dynamic relations
   // instead of checking zero count of static relations?
   return (
-    mod.reasons.map(r => r.dependency).filter(isDependencyStatic).length === 0
+    mod.reasons.map((r) => r.dependency).filter(isDependencyStatic).length === 0
   )
 }
 
@@ -122,20 +123,20 @@ const onlyStaticParents = (r: Reason) => isDependencyStatic(r.dependency)
 const findChunkParents = (mod: Module, depsChain: Module[] = []): Module[] => {
   const staticParents = mod.reasons
     .filter(onlyStaticParents)
-    .map(r => r.module)
+    .map((r) => r.module)
     .filter(uniq)
-    .filter(_ => !!_)
+    .filter((_) => !!_)
   const staticParentsNotInChain = staticParents.filter(
-    m => depsChain.indexOf(m) < 0
+    (m) => depsChain.indexOf(m) < 0
   )
   if (!staticParents.length) {
     return [mod]
   }
   const chunks = staticParentsNotInChain.filter(moduleIsChunk)
-  const notChunks = staticParentsNotInChain.filter(m => !moduleIsChunk(m))
+  const notChunks = staticParentsNotInChain.filter((m) => !moduleIsChunk(m))
   const newChain = depsChain.concat(mod).concat(notChunks)
   return notChunks
-    .map(m => findChunkParents(m, newChain))
+    .map((m) => findChunkParents(m, newChain))
     .reduce<Module[]>(flatten, [])
     .concat(chunks)
 }
@@ -159,7 +160,7 @@ module.exports = function (this: LoaderContext, source: string) {
     console.log(
       'Static parents: ',
       this._module.context,
-      parentChunks.filter(uniq).map(p => ({
+      parentChunks.filter(uniq).map((p) => ({
         req: p.userRequest,
         name: p.name,
         id: p.id,
@@ -169,16 +170,16 @@ module.exports = function (this: LoaderContext, source: string) {
   }
   const parentChunksIds = parentChunks
     .map(
-      m => m.name || getChunkNameOfDynamicDependency(m) || ''
+      (m) => m.name || getChunkNameOfDynamicDependency(m) || ''
       //m.debugId
     )
-    .filter(_ => _)
+    .filter((_) => _)
     .filter(uniq)
     .sort()
 
   const parentChunksContextId = getShortHash(
     parentChunks
-      .map(m => m.context.slice(this.rootContext.length))
+      .map((m) => m.context.slice(this.rootContext.length))
       .filter(uniq)
       .join('')
       .replace(/\\/g, '/')
@@ -189,13 +190,22 @@ module.exports = function (this: LoaderContext, source: string) {
     /__CHUNK_ID__/g,
     chunkId + '.'
   )
+  const allowExportReplace = false
   const replaceRegExp = new RegExp(this.data.exportStr + '.*?;')
-  if (replaceRegExp.test(source)) {
+  if (allowExportReplace && replaceRegExp.test(source)) {
     source = source.replace(replaceRegExp, newExport)
   } else {
-    source = [this.data.promiseStr, newExport].join('\n')
+    source = [this.data.promiseStr, this.data.keysFnStr, newExport].join('\n')
   }
   return source
+}
+
+const getExportAssignStr = (exportTarget: string, exportName: string) => {
+  return exportTarget === 'es6'
+    ? exportName === 'default'
+      ? 'export default'
+      : `export const ${exportName} =`
+    : `exports${exportName ? '.' + exportName : ''} =`
 }
 
 module.exports.pitch = function (
@@ -237,7 +247,7 @@ module.exports.pitch = function (
   const entries: Entry[] = fs
     .readdirSync(dirname)
     .filter(filterFiles)
-    .map(fileName => ({
+    .map((fileName) => ({
       fileName,
       label: fileName.replace(/\..*/, ''),
     }))
@@ -262,20 +272,24 @@ module.exports.pitch = function (
       ? options.exportTarget.toLocaleLowerCase()
       : 'es6'
 
-  const exportStr =
-    exportTarget === 'es6'
-      ? exportName === 'default'
-        ? 'export default'
-        : `export const {exportName} =`
-      : `exports${exportName ? '.' + exportName : ''} =`
+  const exportStr = getExportAssignStr(exportTarget, exportName)
 
   const promiseStr = promiseLib
     ? `var Promise = require(${JSON.stringify(promiseLib)});\n`
     : ''
 
+  const allLabelsStr = entries
+    .map((e) => e.label)
+    .map((l) => JSON.stringify(l))
+    .join(',')
+
+  const keysFnStr =
+    getExportAssignStr(exportTarget, 'keys') +
+    ` function() {return [${allLabelsStr}]};\n`
+
   const fullExportStr = [`${exportStr} function (label) {\n`]
     .concat(
-      entries.map(entry =>
+      entries.map((entry) =>
         [
           'if (label === ' + JSON.stringify(entry.label) + ') {',
           getPromiseSource(entry),
@@ -290,5 +304,6 @@ module.exports.pitch = function (
   data.promiseStr = promiseStr
   data.exportStr = exportStr
   data.fullExportStr = fullExportStr
+  data.keysFnStr = keysFnStr
   data.result = [promiseStr, fullExportStr].join('')
 }
